@@ -20,7 +20,7 @@ public class ResourceManagement
     /* TODO : Fill in your name and your partner's name */
     System.out.println("This solution was completed by:");
     System.out.println("<Bryan Salyer>");
-    System.out.println("<student name #2 (if no partner write \"N/A\")>");
+    System.out.println("<Jammel Weaver");
   }
 
   /* Constructor for a ResourceManagement object
@@ -36,10 +36,13 @@ public class ResourceManagement
     this.departmentPQ = new PriorityQueue<Department>();
     this.departmentsList = new ArrayList<Department>();
 
+    
     //Looping through each of the departmernts making department objects
+    int order = 0;
     for (String f : fileNames) {
       Department d = new Department(f);
       if (d.priority == null) d.priority = 0.0;
+       d.insertionOrder = order++;
       departmentPQ.add(d);
       departmentsList.add(d);
     }
@@ -67,7 +70,7 @@ public class ResourceManagement
   private void allocateBudget(  ){
     /* Simulate the algorithm for picking the items to purchase */
     /* Print a record of each item as they are purchased (see PDF and sample output for example tables) */
-System.out.println("ITEMS PURCHASED---------------------------");
+System.out.println("ITEMS PURCHASED\n---------------------------");
 
 //Allows purchace of items as long as the budget remains for the department
  while (remainingBudget > 0.0000001 && !departmentPQ.isEmpty()) {
@@ -121,10 +124,19 @@ departmentPQ.add(dept);
    * Print a summary of what each department received and did not receive
    */    
   private void printSummaryOfDistribution(  ){
-System.out.println("----------------------------------------------------------------");
+ArrayList<Department> sortedDepts = new ArrayList<Department>(departmentsList);
+    sortedDepts.sort((d1, d2) -> {
+        Double p1 = d1.priority == null ? 0.0 : d1.priority;
+        Double p2 = d2.priority == null ? 0.0 : d2.priority;
+        int cmp = p1.compareTo(p2);
+        if (cmp != 0) return cmp;
+        return Integer.compare(d1.insertionOrder, d2.insertionOrder);
+    });
 
 //loops through each department to display what they did and didn't receive
-    for (Department dept : departmentsList) {
+    
+for (Department dept : sortedDepts) {
+  System.out.print("Department of ");
       System.out.println(dept.name);
 
       String totalSpentStr = String.format("$%.2f", dept.priority);
@@ -150,7 +162,7 @@ System.out.println("------------------------------------------------------------
       }
 
       //displays items that were not receved both removed and remaining
-      System.out.println("ITEMS NOT RECEIVED");
+      System.out.println("\nITEMS NOT RECEIVED");
       boolean printedAnyNotReceived = false;
 
       //prints the removed items
@@ -186,6 +198,7 @@ class Department implements Comparable<Department>
   Queue<Item> itemsDesired;   /* list of items this department wants */
   Queue<Item> itemsReceived;  /* list of items this department received */
   Queue<Item> itemsRemoved;   /* list of items that were skipped because they exceeded the remaining budget */
+  int insertionOrder; 
 
   /* TODO
    * Constructor to build a Department from the information in the given fileName
@@ -239,15 +252,21 @@ this.itemsDesired = new LinkedList<Item>(); //Queue to holdwanted items
    */
   //This compairs the priorities (makes the lower in priority earlier in the queue)
   public int compareTo( Department dept ){
-    int cmp = this.priority.compareTo( dept.priority );
-    if (cmp != 0) return cmp;
-    return this.priority.compareTo( dept.priority );
+     Double p1 = this.priority == null ? 0.0 : this.priority;
+  Double p2 = dept.priority == null ? 0.0 : dept.priority;
+
+int cmp = p1.compareTo(p2);
+if (cmp != 0) return cmp;
+
+ return Integer.compare(this.insertionOrder, dept.insertionOrder);
   }
 
   //Makes the departments equal if the names are matching
   
   public boolean equals( Department dept ){
-    return this.name.compareTo( dept.name ) == 0;
+     if (dept == null) return false;
+  if (this.name == null) return dept.name == null;
+  return this.name.equals(dept.name);
   }
 
   @Override 
